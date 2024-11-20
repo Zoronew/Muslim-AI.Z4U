@@ -86,14 +86,19 @@ const sendMessage = async () => {
 
 
 const appendMessage = (sender, content, role) => {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = `message ${role}`;
+  const messageDiv = document.createElement("div");
+  messageDiv.className = `message ${role}`;
+
+  
+  const cleanedContent = content.replace(/###/g, '').replace(/\*\*/g, '').replace(/\n/g, '<br>');
+
     messageDiv.innerHTML = `
-        <div class="message-header">${sender}</div>
-        <div>${content}</div>
-    `;
-    chatWindow.appendChild(messageDiv);
-    saveConversation();
+      <div class="message-header">${sender}</div>
+      <div>${cleanedContent.replace(/\n/g, '<br>')}</div> <!-- الحفاظ على الأسطر الجديدة -->
+  `;
+  chatWindow.appendChild(messageDiv);
+  scrollToBottom();
+  saveConversation();
 };
 
 
