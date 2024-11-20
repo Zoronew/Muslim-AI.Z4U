@@ -1,23 +1,23 @@
 const apiBase = "https://zoro-foryou.vercel.app/api/web-islamai";
 
-// إنشاء معرف عشوائي فريد لكل مستخدم
+
 const generateUserId = () => {
     return 'user-' + Math.random().toString(36).substr(2, 9);
 };
 
-// الحصول على معرف المستخدم الحالي أو إنشاء جديد
+
 let userId = localStorage.getItem("userId");
 if (!userId) {
     userId = generateUserId();
     localStorage.setItem("userId", userId);
 }
 
-// العناصر في الصفحة
+
 const chatWindow = document.getElementById("chat-window");
 const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send-button");
 
-// دالة حذف المحادثة باستخدام API
+
 const deleteConversation = async () => {
     try {
         const deleteUrl = `${apiBase}/conversation/${userId}`;
@@ -33,7 +33,7 @@ const deleteConversation = async () => {
     }
 };
 
-// تحميل المحادثة الخاصة بالمستخدم الحالي
+
 const loadConversation = () => {
     chatWindow.innerHTML = `
         <div class="message ai">
@@ -43,24 +43,24 @@ const loadConversation = () => {
     scrollToBottom();
 };
 
-// حفظ المحادثة في LocalStorage
+
 const saveConversation = () => {
     const conversationKey = `conversation-${userId}`;
     localStorage.setItem(conversationKey, chatWindow.innerHTML);
 };
 
-// إرسال رسالة جديدة
+
 const sendMessage = async () => {
     const message = messageInput.value.trim();
     if (!message) return;
 
-    // إضافة رسالة المستخدم إلى واجهة الدردشة
+   
     appendMessage("YOU", message, "user");
 
-    // مسح حقل الإدخال بعد الإرسال
+  
     messageInput.value = "";
 
-    // عرض رسالة انتظار
+    
     const loadingMessage = appendLoadingMessage();
 
     try {
@@ -84,7 +84,7 @@ const sendMessage = async () => {
     saveConversation();
 };
 
-// إضافة رسالة جديدة إلى واجهة الدردشة
+
 const appendMessage = (sender, content, role) => {
     const messageDiv = document.createElement("div");
     messageDiv.className = `message ${role}`;
@@ -96,7 +96,7 @@ const appendMessage = (sender, content, role) => {
     saveConversation();
 };
 
-// رسالة انتظار مؤقتة
+
 const appendLoadingMessage = () => {
     const loadingDiv = document.createElement("div");
     loadingDiv.className = "message ai";
@@ -109,12 +109,12 @@ const appendLoadingMessage = () => {
     return loadingDiv;
 };
 
-// إزالة رسالة الانتظار
+
 const removeLoadingMessage = (loadingMessage) => {
     if (loadingMessage) loadingMessage.remove();
 };
 
-// التمرير إلى آخر الرسائل
+
 const scrollToBottom = () => {
     chatWindow.scrollTo({
         top: chatWindow.scrollHeight,
@@ -122,13 +122,13 @@ const scrollToBottom = () => {
     });
 };
 
-// تحميل المحادثة عند فتح الصفحة مع حذف المحادثة السابقة من الخادم
+
 window.onload = async () => {
-    await deleteConversation(); // حذف المحادثة السابقة من الخادم
-    loadConversation(); // تحميل محادثة جديدة
+    await deleteConversation(); 
+    loadConversation();
 };
 
-// إضافة أحداث الأزرار
+
 sendButton.addEventListener("click", sendMessage);
 messageInput.addEventListener("keypress", (event) => {
     if (event.key === "Enter") {
