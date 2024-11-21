@@ -1,4 +1,6 @@
 const apiBase = "https://zoro-foryou.vercel.app/api/web-islamai";
+const fallbackApiBase = "https://zoro-api-zoro-bot-5b28aebf.koyeb.app/api/islam-ai2"; 
+const maxRetries = 3;  
 
 
 const generateUserId = () => {
@@ -6,11 +8,7 @@ const generateUserId = () => {
 };
 
 
-let userId = localStorage.getItem("userId");
-if (!userId) {
-    userId = generateUserId();
-    localStorage.setItem("userId", userId);
-}
+const userId = generateUserId();
 
 
 const chatWindow = document.getElementById("chat-window");
@@ -38,7 +36,7 @@ const loadConversation = () => {
     chatWindow.innerHTML = `
         <div class="message ai">
             <div class="message-header">Muslim AI</div>
-            السلام عليكم كيف يمكنني مساعدتك اليوم في الاسئله الاسلاميه ؟
+         السلام عليكم كيف يمكنني مساعدتك اليوم في مجال الاسئله الاسلامية ؟
         </div>`;
     scrollToBottom();
 };
@@ -54,32 +52,54 @@ const sendMessage = async () => {
     const message = messageInput.value.trim();
     if (!message) return;
 
-   
     appendMessage("YOU", message, "user");
-
-  
     messageInput.value = "";
-
-    
     const loadingMessage = appendLoadingMessage();
 
-    try {
-        const response = await fetch(`${apiBase}?userId=${userId}&q=${encodeURIComponent(message)}`);
-        const data = await response.json();
+    let attempt = 0;
+    let response = null;
+    let data = null;
+    let success = false;
 
-        removeLoadingMessage(loadingMessage);
+    
+    while (attempt < maxRetries && !success) {
+        attempt++;
+        try {
+            
+            response = await fetch(`${apiBase}?userId=${userId}&q=${encodeURIComponent(message)}`);
+            data = await response.json();
 
-        if (data.status && data.result) {
-            appendMessage("Muslim AI", data.result, "ai");
-        } else {
-            appendMessage("Muslim AI", "لم يتم تلقي رد من المساعد. حاول مرة أخرى.", "ai");
+           
+            if (response.status === 504 || !data.status || !data.result) {
+                console.log(`المساعد الأول لم يرد أو حدث Timeout، المحاولة ${attempt} من ${maxRetries}...`);
+                response = await fetch(`${fallbackApiBase}?userId=${userId}&q=${encodeURIComponent(message)}`);
+                data = await response.json();
+            }
+
+            
+            if (data.status && data.result) {
+                success = true;
+                appendMessage("Muslim AI", data.result, "ai");
+            } else {
+                console.log("لم يتم تلقي رد صالح، إعادة المحاولة...");
+            }
+        } catch (error) {
+            console.error("خطأ في إرسال الرسالة:", error);
+            console.log(`إعادة المحاولة ${attempt} من ${maxRetries}...`);
         }
-    } catch (error) {
-        console.error("Error sending message:", error);
-        removeLoadingMessage(loadingMessage);
-        appendMessage("Muslim AI", "حدث خطأ أثناء معالجة الطلب. حاول مرة أخرى.", "ai");
+
+        
+        if (!success && attempt < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
     }
 
+    
+    if (!success) {
+        appendMessage("Muslim AI", "اسف لم استطع الحصول علي جواب لسؤالك هل استطيع مساعدتك في سؤال اخر ؟", "ai");
+    }
+
+    removeLoadingMessage(loadingMessage);
     scrollToBottom();
     saveConversation();
 };
@@ -107,7 +127,7 @@ const appendLoadingMessage = () => {
     loadingDiv.className = "message ai";
     loadingDiv.innerHTML = `
         <div class="message-header">Muslim AI</div>
-        Wait...
+        جارٍ الإرسال...
     `;
     chatWindow.appendChild(loadingDiv);
     scrollToBottom();
@@ -129,7 +149,7 @@ const scrollToBottom = () => {
 
 
 window.onload = async () => {
-    await deleteConversation(); 
+    await deleteConversation();
     loadConversation();
 };
 
