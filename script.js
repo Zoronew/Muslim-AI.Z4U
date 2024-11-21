@@ -127,7 +127,7 @@ const appendLoadingMessage = () => {
     loadingDiv.className = "message ai";
     loadingDiv.innerHTML = `
         <div class="message-header">Muslim AI</div>
-        جارٍ الإرسال...
+       Wait...
     `;
     chatWindow.appendChild(loadingDiv);
     scrollToBottom();
