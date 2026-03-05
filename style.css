@@ -1,18 +1,22 @@
-/* 1. الإعدادات العامة وتحسينات الـ Body */
+/* =========================
+   1. الإعدادات العامة
+========================= */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Tajawal', sans-serif;
     background: linear-gradient(to bottom, #1e1e2f, #111119);
     color: #fff;
-    height: 100vh; /* تم التعديل لملء الشاشة بالكامل */
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* منع السكرول الخارجي المزعج */
+    overflow: hidden;
 }
 
-/* 2. الحاوية الرئيسية */
+/* =========================
+   2. الحاوية الرئيسية
+========================= */
 .app-container {
     display: flex;
     flex-direction: row;
@@ -26,7 +30,9 @@ body {
     position: relative;
 }
 
-/* 3. القائمة الجانبية (Sidebar) */
+/* =========================
+   3. القائمة الجانبية
+========================= */
 .sidebar {
     width: 25%;
     background: #111119;
@@ -51,7 +57,9 @@ body {
     color: #eee;
 }
 
-/* 4. منطقة الدردشة */
+/* =========================
+   4. منطقة الدردشة
+========================= */
 .chat-container {
     flex: 1;
     display: flex;
@@ -73,7 +81,9 @@ header h1 {
     font-size: 1.8rem;
 }
 
-/* 5. نافذة الرسائل وسكرول بار */
+/* =========================
+   5. نافذة الرسائل
+========================= */
 main {
     flex: 1;
     overflow-y: auto;
@@ -92,7 +102,9 @@ main::-webkit-scrollbar-thumb {
     border-radius: 10px;
 }
 
-/* 6. تنسيق الرسائل والحركات */
+/* =========================
+   6. الرسائل
+========================= */
 .message {
     max-width: 85%;
     padding: 12px 16px;
@@ -129,7 +141,9 @@ main::-webkit-scrollbar-thumb {
     color: #d4af37;
 }
 
-/* 7. صندوق التفكير (Think) - الميزة الجديدة */
+/* =========================
+   7. صندوق التفكير (Think)
+========================= */
 .think-container {
     background: rgba(26, 115, 232, 0.1) !important;
     border-right: 4px solid #1a73e8 !important;
@@ -145,7 +159,9 @@ main::-webkit-scrollbar-thumb {
     font-style: italic;
 }
 
-/* 8. الفوتر وحقل الإدخال الاحترافي */
+/* =========================
+   8. الفوتر وحقل الإدخال
+========================= */
 footer {
     padding: 15px;
     background: #1e1e2f;
@@ -154,7 +170,7 @@ footer {
 
 .input-container {
     display: flex;
-    align-items: flex-end; /* لضمان بقاء الزر بالأسفل عند توسع الحقل */
+    align-items: flex-end;
     gap: 10px;
     background: #2a2a3b;
     padding: 8px 15px;
@@ -197,7 +213,14 @@ footer {
     transform: scale(1.1);
 }
 
-/* 9. فوتر الحقوق الخارجي */
+#send-button:disabled {
+    background: #D7D7D7;
+    color: #f4f4f4;
+}
+
+/* =========================
+   9. فوتر الحقوق الخارجي
+========================= */
 .footer-rights {
     background: #111119;
     color: rgba(212, 175, 55, 0.8);
@@ -212,29 +235,33 @@ footer {
     z-index: 10;
 }
 
-/* 10. التجاوب مع الشاشات (Responsive) */
+/* =========================
+   10. Responsive
+========================= */
 @media (max-width: 768px) {
     .app-container {
         flex-direction: column;
         width: 100%;
         height: 100vh;
         border-radius: 0;
-        margin-bottom: 0;
     }
 
     .sidebar {
-        display: none; /* إخفاء الجانبية في الموبايل لزيادة مساحة الدردشة */
+        display: none;
     }
 
     header h1 { font-size: 1.5rem; }
 
-    main { padding: 15px; padding-bottom: 100px; }
+    main { 
+        padding: 15px; 
+        padding-bottom: 100px; 
+    }
 
     .message { max-width: 92%; }
 
     footer {
         position: fixed;
-        bottom: 35px; /* رفع الفوتر قليلاً لترك مساحة لفوتر الحقوق */
+        bottom: 35px;
         width: 100%;
     }
 }
@@ -245,7 +272,9 @@ footer {
     .footer-rights { font-size: 0.7rem; }
 }
 
-/* أنيميشن التحميل */
+/* =========================
+   11. أنيميشن التحميل
+========================= */
 .loading-pulse {
     opacity: 0.6;
     animation: blink 1.5s infinite;
