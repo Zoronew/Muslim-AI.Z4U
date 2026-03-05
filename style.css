@@ -1,22 +1,18 @@
-/* =========================
-   1. الإعدادات العامة
-========================= */
+/* 1. الإعدادات العامة وتحسينات الـ Body */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Tajawal', sans-serif;
     background: linear-gradient(to bottom, #1e1e2f, #111119);
     color: #fff;
-    height: 100vh;
+    height: 100vh; /* ملء الشاشة بالكامل */
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow: hidden; /* منع السكرول الخارجي المزعج */
 }
 
-/* =========================
-   2. الحاوية الرئيسية
-========================= */
+/* 2. الحاوية الرئيسية */
 .app-container {
     display: flex;
     flex-direction: row;
@@ -30,9 +26,7 @@ body {
     position: relative;
 }
 
-/* =========================
-   3. القائمة الجانبية
-========================= */
+/* 3. القائمة الجانبية (Sidebar) */
 .sidebar {
     width: 25%;
     background: #111119;
@@ -57,9 +51,7 @@ body {
     color: #eee;
 }
 
-/* =========================
-   4. منطقة الدردشة
-========================= */
+/* 4. منطقة الدردشة */
 .chat-container {
     flex: 1;
     display: flex;
@@ -81,9 +73,7 @@ header h1 {
     font-size: 1.8rem;
 }
 
-/* =========================
-   5. نافذة الرسائل
-========================= */
+/* 5. نافذة الرسائل وسكرول بار */
 main {
     flex: 1;
     overflow-y: auto;
@@ -91,6 +81,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding-bottom: 20px;
 }
 
 main::-webkit-scrollbar {
@@ -102,9 +93,7 @@ main::-webkit-scrollbar-thumb {
     border-radius: 10px;
 }
 
-/* =========================
-   6. الرسائل
-========================= */
+/* 6. تنسيق الرسائل والحركات */
 .message {
     max-width: 85%;
     padding: 12px 16px;
@@ -112,6 +101,7 @@ main::-webkit-scrollbar-thumb {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     animation: fadeIn 0.4s ease;
     line-height: 1.6;
+    position: relative;
 }
 
 @keyframes fadeIn {
@@ -141,9 +131,7 @@ main::-webkit-scrollbar-thumb {
     color: #d4af37;
 }
 
-/* =========================
-   7. صندوق التفكير (Think)
-========================= */
+/* 7. صندوق التفكير (Think) */
 .think-container {
     background: rgba(26, 115, 232, 0.1) !important;
     border-right: 4px solid #1a73e8 !important;
@@ -157,11 +145,10 @@ main::-webkit-scrollbar-thumb {
     color: #a0a0a0;
     font-size: 0.85em;
     font-style: italic;
+    line-height: 1.5;
 }
 
-/* =========================
-   8. الفوتر وحقل الإدخال
-========================= */
+/* 8. الفوتر وحقل الإدخال */
 footer {
     padding: 15px;
     background: #1e1e2f;
@@ -170,12 +157,17 @@ footer {
 
 .input-container {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-end; 
     gap: 10px;
     background: #2a2a3b;
     padding: 8px 15px;
     border-radius: 25px;
     border: 1px solid #3d3d5c;
+    transition: border-color 0.3s;
+}
+
+.input-container:focus-within {
+    border-color: #d4af37;
 }
 
 #message-input {
@@ -208,19 +200,24 @@ footer {
     flex-shrink: 0;
 }
 
-#send-button:hover {
+#send-button svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
+#send-button:hover:not(:disabled) {
     background-color: #c39b28;
     transform: scale(1.1);
 }
 
 #send-button:disabled {
-    background: #D7D7D7;
-    color: #f4f4f4;
+    background: #555;
+    color: #888;
+    cursor: not-allowed;
 }
 
-/* =========================
-   9. فوتر الحقوق الخارجي
-========================= */
+/* 9. فوتر الحقوق الخارجي */
 .footer-rights {
     background: #111119;
     color: rgba(212, 175, 55, 0.8);
@@ -235,9 +232,7 @@ footer {
     z-index: 10;
 }
 
-/* =========================
-   10. Responsive
-========================= */
+/* 10. التجاوب مع الشاشات (Responsive) */
 @media (max-width: 768px) {
     .app-container {
         flex-direction: column;
@@ -247,22 +242,23 @@ footer {
     }
 
     .sidebar {
-        display: none;
+        display: none; /* إخفاء الجانبية لزيادة مساحة الدردشة */
     }
 
     header h1 { font-size: 1.5rem; }
 
     main { 
         padding: 15px; 
-        padding-bottom: 100px; 
+        padding-bottom: 120px; /* مساحة إضافية للفوتر الثابت */
     }
 
     .message { max-width: 92%; }
 
     footer {
         position: fixed;
-        bottom: 35px;
+        bottom: 35px; /* فوق فوتر الحقوق */
         width: 100%;
+        box-sizing: border-box;
     }
 }
 
@@ -272,9 +268,7 @@ footer {
     .footer-rights { font-size: 0.7rem; }
 }
 
-/* =========================
-   11. أنيميشن التحميل
-========================= */
+/* أنيميشن التحميل */
 .loading-pulse {
     opacity: 0.6;
     animation: blink 1.5s infinite;
