@@ -145,23 +145,6 @@ footer {
     gap: 10px;
 }
 
-#message-input {
-    flex: 1;
-    padding: 10px;
-    border: 2px solid #444466;
-    border-radius: 8px;
-    background: #2a2a3b;
-    color: #fff;
-    font-size: 1.2rem;
-    resize: none;
-    transition: all 0.3s;
-}
-
-#message-input:focus {
-    border-color: #d4af37;
-    outline: none;
-}
-
 #send-button {
     width: 50px;
     height: 50px;
@@ -288,31 +271,48 @@ footer {
     width: 100%;
     z-index: 10;
 }
+/* تنسيق حقل الإدخال المتوسع */
+#message-input {
+    width: 100%;
+    min-height: 45px;
+    max-height: 150px;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    resize: none;
+    font-size: 16px;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color 0.3s;
+    background: #fff;
+}
+
+#message-input:focus {
+    border-color: #1a73e8;
+}
+
+/* تنسيق مربع التفكير (Think) */
 .think-container {
-    background-color: #f8f9fa !important; /* لون هادئ */
-    border-right: 3px solid #1a73e8 !important; /* خط جانبي أزرق */
-    border-left: none !important;
-    opacity: 0.85;
-    margin: 5px 20px !important;
-    padding: 8px 12px !important;
-    border-radius: 8px !important;
+    background-color: #f1f3f4 !important;
+    border-right: 4px solid #1a73e8 !important;
+    margin: 10px 20px !important;
+    padding: 12px !important;
+    border-radius: 10px !important;
+    opacity: 0.9;
 }
 
 .think-content {
     color: #5f6368;
     font-size: 0.9em;
     font-style: italic;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
-/* حركة نبض خفيفة للتحميل */
-.loading-pulse {
-    animation: pulse 1.5s infinite;
-}
+/* تحسين شكل الرسائل */
+.message { margin-bottom: 20px; padding: 10px; border-radius: 10px; }
+.message.user { background: #e3f2fd; align-self: flex-start; }
+.message.ai { background: #fff; border: 1px solid #eee; }
 
-@keyframes pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
-}
+.loading-pulse { opacity: 0.6; animation: blink 1.5s infinite; }
+@keyframes blink { 50% { opacity: 1; } }
 
