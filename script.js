@@ -1,4 +1,4 @@
-// العناوين والإعدادات
+// العناوين والإعدادات - API 2 (Koyeb) هو الخيار الأول
 const apiBase = "https://zoro-api-zoro-bot-5b28aebf.koyeb.app/api/islam-ai2"; 
 const fallbackApiBase = "https://zoro-foryou.vercel.app/api/web-islamai";
 const maxRetries = 3;  
@@ -10,7 +10,7 @@ const chatWindow = document.getElementById("chat-window");
 const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send-button");
 
-// تهيئة الجلسة
+// تهيئة الجلسة وحذف محادثات السيرفر
 const deleteConversation = async () => {
     try {
         const urls = [`${apiBase}/conversation/${userId}`, `${fallbackApiBase}/conversation/${userId}`];
@@ -33,29 +33,36 @@ const sendMessage = async () => {
     while (attempt < maxRetries && !success) {
         attempt++;
         try {
+            console.log(`محاولة جلب الرد... محاولة رقم ${attempt}`);
+            
+            // المحاولة من السيرفر الأساسي
             let response = await fetch(`${apiBase}?userId=${userId}&q=${encodeURIComponent(message)}`);
             let data = await response.json();
 
+            // التبديل للبديل إذا فشل الأساسي
             if (!response.ok || !data.status || !data.result) {
+                console.log("السيرفر الأساسي لم يستجب، ننتقل للبديل...");
                 response = await fetch(`${fallbackApiBase}?userId=${userId}&q=${encodeURIComponent(message)}`);
                 data = await response.json();
             }
 
             if (data.status && data.result) {
                 success = true;
-                removeLoadingMessage(loadingMessage); // حذف كلمة Wait..
+                removeLoadingMessage(loadingMessage);
 
-                // 1. عرض مربع التفكير إذا كان موجوداً
+                // 1. عرض مربع التفكير أولاً إذا كان متاحاً
                 if (data.think) {
-                    appendThinkMessage("Muslim AI (Thinking...)", data.think);
-                    // تأخير بسيط لإعطاء إيحاء بالتفكير قبل ظهور الإجابة النهائية
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    const thinkDiv = appendThinkMessage("Muslim AI Thinking...", data.think);
+                    // تأخير بسيط 1.5 ثانية ليشعر المستخدم أن هناك عملية معالجة
+                    await new Promise(resolve => setTimeout(resolve, 1500));
                 }
 
                 // 2. عرض الإجابة النهائية
                 appendMessage("Muslim AI", data.result, "ai");
             }
-        } catch (error) { console.error("Connection error:", error); }
+        } catch (error) { 
+            console.error("Connection error:", error); 
+        }
 
         if (!success && attempt < maxRetries) {
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -64,48 +71,60 @@ const sendMessage = async () => {
 
     if (!success) {
         removeLoadingMessage(loadingMessage);
-        appendMessage("Muslim AI", "عذراً، لم أستطع جلب الإجابة. حاول مجدداً.", "ai");
+        appendMessage("Muslim AI", "عذراً، الخادم لا يستجيب حالياً. يرجى المحاولة مرة أخرى.", "ai");
     }
     saveConversation();
 };
 
-// دالة مخصصة لعرض "التفكير" بشكل جمالي
+// دالة عرض "التفكير" بتنسيق مميز
 const appendThinkMessage = (sender, content) => {
     const messageDiv = document.createElement("div");
-    messageDiv.className = "message ai think-container"; // كلاس جديد للتنسيق
+    messageDiv.className = "message ai think-container";
     
-    // تنسيق نص التفكير (إزالة العلامات الغريبة)
+    // تنظيف نص التفكير
     const cleanedThink = content.replace(/\n/g, '<br>');
 
     messageDiv.innerHTML = `
-        <div class="message-header" style="color: #888; font-style: italic;">${sender}</div>
-        <div class="think-content" style="color: #666; border-left: 2px solid #ddd; padding-left: 10px; font-size: 0.9em; font-style: italic;">
+        <div class="message-header" style="color: #1a73e8; font-size: 0.85em;">
+            <i class="fas fa-microchip"></i> ${sender}
+        </div>
+        <div class="think-content">
             ${cleanedThink}
         </div>
     `;
     chatWindow.appendChild(messageDiv);
     scrollToBottom();
+    return messageDiv;
 };
 
-// إضافة الرسائل العادية
+// إضافة الرسائل العادية (User & AI)
 const appendMessage = (sender, content, role) => {
     const messageDiv = document.createElement("div");
     messageDiv.className = `message ${role}`;
-    const cleanedContent = content.replace(/###/g, '').replace(/\*\*/g, '').replace(/\n/g, '<br>');
+    
+    // تنظيف المارك داون
+    const cleanedContent = content
+        .replace(/###/g, '')
+        .replace(/\*\*/g, '')
+        .replace(/\n/g, '<br>');
 
     messageDiv.innerHTML = `
         <div class="message-header">${sender}</div>
-        <div>${cleanedContent}</div>
+        <div class="message-text">${cleanedContent}</div>
     `;
     chatWindow.appendChild(messageDiv);
     scrollToBottom();
+    saveConversation();
 };
 
-// دالة الانتظار
+// رسالة التحميل (Loading)
 const appendLoadingMessage = () => {
     const loadingDiv = document.createElement("div");
     loadingDiv.className = "message ai loading-pulse";
-    loadingDiv.innerHTML = `<div class="message-header">Muslim AI</div><div class="dots">جارٍ التفكير...</div>`;
+    loadingDiv.innerHTML = `
+        <div class="message-header">Muslim AI</div>
+        <div class="dots">جاري البحث في المصادر الإسلامية...</div>
+    `;
     chatWindow.appendChild(loadingDiv);
     scrollToBottom();
     return loadingDiv;
@@ -115,7 +134,16 @@ const removeLoadingMessage = (loadingMessage) => { if (loadingMessage) loadingMe
 const scrollToBottom = () => chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: "smooth" });
 const saveConversation = () => localStorage.setItem(`conversation-${userId}`, chatWindow.innerHTML);
 
-window.onload = async () => { await deleteConversation(); chatWindow.innerHTML = `<div class="message ai"><div class="message-header">Muslim AI</div>السلام عليكم، كيف أساعدك اليوم؟</div>`; };
+// عند تحميل الصفحة
+window.onload = async () => { 
+    await deleteConversation(); 
+    chatWindow.innerHTML = `
+        <div class="message ai">
+            <div class="message-header">Muslim AI</div>
+            السلام عليكم ورحمة الله وبركاته، كيف يمكنني مساعدتك اليوم؟
+        </div>`; 
+};
 
+// أحداث الضغط
 sendButton.addEventListener("click", sendMessage);
 messageInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
