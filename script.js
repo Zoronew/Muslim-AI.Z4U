@@ -10,11 +10,11 @@ const chatWindow = document.getElementById("chat-window");
 const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send-button");
 
-/** * 1. الجزء الخاص بالتحكم في حجم الحقل تلقائياً (تعديل احترافي)
+/** * 1. الجزء الخاص بالتحكم في حجم الحقل تلقائياً 
  */
 messageInput.addEventListener("input", function() {
-    this.style.height = "auto"; // إعادة التعيين لحساب الارتفاع الصحيح
-    this.style.height = (this.scrollHeight) + "px"; // التوسع بناءً على المحتوى
+    this.style.height = "auto"; 
+    this.style.height = (this.scrollHeight) + "px"; 
 });
 
 // تهيئة الجلسة وحذف محادثات السيرفر
@@ -59,12 +59,38 @@ const sendMessage = async () => {
                 success = true;
                 removeLoadingMessage(loadingMessage);
 
+                // دمج التفكير والنتيجة في رسالة واحدة لتنسيق أفضل
+                const aiMessageDiv = document.createElement("div");
+                aiMessageDiv.className = "message ai";
+                
+                // إضافة جزء التفكير إذا وجد بنظام القائمة المنسدلة
                 if (data.think) {
-                    appendThinkMessage("Muslim AI Thinking...", data.think);
-                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    const cleanedThink = data.think.replace(/\n/g, '<br>');
+                    aiMessageDiv.innerHTML += `
+                        <details class="think-container">
+                            <summary class="think-header">
+                                <i class="fas fa-brain"></i> مرحلة التفكير (اضغط للعرض)
+                            </summary>
+                            <div class="think-content">
+                                ${cleanedThink}
+                            </div>
+                        </details>
+                    `;
                 }
 
-                appendMessage("Muslim AI", data.result, "ai");
+                // إضافة النتيجة النهائية
+                const cleanedResult = data.result
+                    .replace(/###/g, '')
+                    .replace(/\*\*/g, '')
+                    .replace(/\n/g, '<br>');
+
+                aiMessageDiv.innerHTML += `
+                    <div class="message-header"><b>Muslim AI</b></div>
+                    <div class="message-text">${cleanedResult}</div>
+                `;
+
+                chatWindow.appendChild(aiMessageDiv);
+                scrollToBottom();
             }
         } catch (error) { 
             console.error("Connection error:", error); 
@@ -82,27 +108,7 @@ const sendMessage = async () => {
     saveConversation();
 };
 
-// دالة عرض "التفكير" بتنسيق مميز
-const appendThinkMessage = (sender, content) => {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = "message ai think-container";
-    
-    const cleanedThink = content.replace(/\n/g, '<br>');
-
-    messageDiv.innerHTML = `
-        <div class="message-header" style="color: #1a73e8; font-size: 0.85em;">
-            <i class="fas fa-microchip"></i> ${sender}
-        </div>
-        <div class="think-content">
-            ${cleanedThink}
-        </div>
-    `;
-    chatWindow.appendChild(messageDiv);
-    scrollToBottom();
-    return messageDiv;
-};
-
-// إضافة الرسائل العادية (User & AI)
+// إضافة الرسائل العادية (User & AI اليدوية)
 const appendMessage = (sender, content, role) => {
     const messageDiv = document.createElement("div");
     messageDiv.className = `message ${role}`;
@@ -143,28 +149,9 @@ window.onload = async () => {
     await deleteConversation(); 
     chatWindow.innerHTML = `
         <div class="message ai">
-
-    <div class="message-header">Muslim AI</div>
-
-    
-
-    <details class="think-container">
-
-        <summary class="think-header">مرحلة التفكير</summary>
-
-        <div class="think-content">
-
-            هنا الكلام الكثير الذي تريد إخفاءه...
-
-        </div>
-
-    </details>
-
-
-
-    السلام عليكم ورحمة الله وبركاته، كيف يمكنني مساعدتك اليوم؟
-
-</div>`; 
+            <div class="message-header">Muslim AI</div>
+            السلام عليكم ورحمة الله وبركاته، كيف يمكنني مساعدتك اليوم؟
+        </div>`; 
 };
 
 // أحداث الضغط
@@ -174,7 +161,7 @@ sendButton.addEventListener("click", sendMessage);
  */
 messageInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault(); // منع السطر الجديد عند الضغط على Enter فقط
+        e.preventDefault(); 
         sendMessage();
     }
 });
