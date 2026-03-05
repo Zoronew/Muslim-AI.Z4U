@@ -146,58 +146,55 @@ main::-webkit-scrollbar-thumb {
 
 /* 7. صندوق التفكير (الخاص بـ DeepSeek وأشباهه) */
 /* 7. صندوق التفكير المطور (القابل للطي) */
+/* صندوق التفكير المطور - مع سهم إجباري */
 .think-container {
-    background: rgba(212, 175, 55, 0.05); /* لون ذهبي خفيف جداً */
-    border-right: 3px solid #d4af37;
+    background: rgba(212, 175, 55, 0.05);
+    border-right: 4px solid #d4af37;
     margin: 10px 0;
     border-radius: 8px;
     overflow: hidden;
-    transition: all 0.3s ease;
+    display: block; /* لضمان عمل الوسم كصندوق */
 }
 
-.think-container[open] {
-    background: rgba(212, 175, 55, 0.1);
-    padding-bottom: 10px;
-}
-
+/* العنوان (الذي يحتوي على السهم) */
 .think-header {
-    padding: 10px 15px;
+    padding: 12px 15px;
     cursor: pointer;
     font-size: 0.85rem;
     color: #d4af37;
     font-weight: bold;
-    list-style: none; /* إخفاء سهم المتصفح الافتراضي */
     display: flex;
     align-items: center;
     gap: 10px;
     user-select: none;
+    list-style: none; /* إخفاء سهم المتصفح الافتراضي */
 }
 
-/* إضافة سهم مخصص */
-.think-header::before {
-    content: '▼';
-    font-size: 0.7rem;
-    transition: transform 0.3s ease;
-}
-
-.think-container[open] .think-header::before {
-    transform: rotate(180deg); /* تدوير السهم عند الفتح */
-}
-
-/* إخفاء السهم الافتراضي في متصفحات Safari/Chrome */
+/* إخفاء سهم المتصفح الافتراضي في سفاري وجوجل كروم */
 .think-header::-webkit-details-marker {
     display: none;
 }
 
+/* إضافة سهم "كود" لضمان ظهوره */
+.think-header::before {
+    content: '▶'; /* سهم يشير لليمين في الحالة المغلقة */
+    display: inline-block;
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+/* عندما يفتح المستخدم الصندوق، يدور السهم للأسفل */
+.think-container[open] .think-header::before {
+    transform: rotate(90deg); /* تدوير السهم ليصبح للأسفل */
+}
+
 .think-content {
-    padding: 0 15px 5px 15px;
+    padding: 10px 15px;
     color: #a0a0a0;
     font-size: 0.85rem;
     font-style: italic;
     line-height: 1.5;
     border-top: 1px solid rgba(212, 175, 55, 0.1);
-    margin-top: 5px;
-    padding-top: 10px;
 }
 
 /* 8. منطقة الإدخال (الفوتر) */
