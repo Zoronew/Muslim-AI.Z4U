@@ -10,6 +10,13 @@ const chatWindow = document.getElementById("chat-window");
 const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send-button");
 
+/** * 1. الجزء الخاص بالتحكم في حجم الحقل تلقائياً (تعديل احترافي)
+ */
+messageInput.addEventListener("input", function() {
+    this.style.height = "auto"; // إعادة التعيين لحساب الارتفاع الصحيح
+    this.style.height = (this.scrollHeight) + "px"; // التوسع بناءً على المحتوى
+});
+
 // تهيئة الجلسة وحذف محادثات السيرفر
 const deleteConversation = async () => {
     try {
@@ -23,8 +30,12 @@ const sendMessage = async () => {
     const message = messageInput.value.trim();
     if (!message) return;
 
-    appendMessage("YOU", message, "user");
+    appendMessage("أنت", message, "user");
+    
+    // إعادة ضبط الحقل بعد الإرسال
     messageInput.value = "";
+    messageInput.style.height = "auto"; 
+    
     const loadingMessage = appendLoadingMessage();
 
     let attempt = 0;
@@ -35,11 +46,9 @@ const sendMessage = async () => {
         try {
             console.log(`محاولة جلب الرد... محاولة رقم ${attempt}`);
             
-            // المحاولة من السيرفر الأساسي
             let response = await fetch(`${apiBase}?userId=${userId}&q=${encodeURIComponent(message)}`);
             let data = await response.json();
 
-            // التبديل للبديل إذا فشل الأساسي
             if (!response.ok || !data.status || !data.result) {
                 console.log("السيرفر الأساسي لم يستجب، ننتقل للبديل...");
                 response = await fetch(`${fallbackApiBase}?userId=${userId}&q=${encodeURIComponent(message)}`);
@@ -50,14 +59,11 @@ const sendMessage = async () => {
                 success = true;
                 removeLoadingMessage(loadingMessage);
 
-                // 1. عرض مربع التفكير أولاً إذا كان متاحاً
                 if (data.think) {
-                    const thinkDiv = appendThinkMessage("Muslim AI Thinking...", data.think);
-                    // تأخير بسيط 1.5 ثانية ليشعر المستخدم أن هناك عملية معالجة
+                    appendThinkMessage("Muslim AI Thinking...", data.think);
                     await new Promise(resolve => setTimeout(resolve, 1500));
                 }
 
-                // 2. عرض الإجابة النهائية
                 appendMessage("Muslim AI", data.result, "ai");
             }
         } catch (error) { 
@@ -81,7 +87,6 @@ const appendThinkMessage = (sender, content) => {
     const messageDiv = document.createElement("div");
     messageDiv.className = "message ai think-container";
     
-    // تنظيف نص التفكير
     const cleanedThink = content.replace(/\n/g, '<br>');
 
     messageDiv.innerHTML = `
@@ -102,14 +107,13 @@ const appendMessage = (sender, content, role) => {
     const messageDiv = document.createElement("div");
     messageDiv.className = `message ${role}`;
     
-    // تنظيف المارك داون
     const cleanedContent = content
         .replace(/###/g, '')
         .replace(/\*\*/g, '')
         .replace(/\n/g, '<br>');
 
     messageDiv.innerHTML = `
-        <div class="message-header">${sender}</div>
+        <div class="message-header"><b>${sender}</b></div>
         <div class="message-text">${cleanedContent}</div>
     `;
     chatWindow.appendChild(messageDiv);
@@ -146,4 +150,12 @@ window.onload = async () => {
 
 // أحداث الضغط
 sendButton.addEventListener("click", sendMessage);
-messageInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+
+/** * 2. تعديل حدث Enter ليدعم الأسطر الجديدة (Shift + Enter)
+ */
+messageInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault(); // منع السطر الجديد عند الضغط على Enter فقط
+        sendMessage();
+    }
+});
