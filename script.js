@@ -143,9 +143,28 @@ window.onload = async () => {
     await deleteConversation(); 
     chatWindow.innerHTML = `
         <div class="message ai">
-            <div class="message-header">Muslim AI</div>
-            السلام عليكم ورحمة الله وبركاته، كيف يمكنني مساعدتك اليوم؟
-        </div>`; 
+
+    <div class="message-header">Muslim AI</div>
+
+    
+
+    <details class="think-container">
+
+        <summary class="think-header">مرحلة التفكير</summary>
+
+        <div class="think-content">
+
+            هنا الكلام الكثير الذي تريد إخفاءه...
+
+        </div>
+
+    </details>
+
+
+
+    السلام عليكم ورحمة الله وبركاته، كيف يمكنني مساعدتك اليوم؟
+
+</div>`; 
 };
 
 // أحداث الضغط
